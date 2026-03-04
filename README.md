@@ -8,40 +8,54 @@ Built as the TypeScript counterpart to [go-ast-mcp](https://github.com/aspect-bu
 
 LLMs waste tokens reading 200-800 line files when they only need one function or type. This server gives Claude (or any MCP client) precise extraction tools that return only what's needed.
 
-## Install
+## Setup
+
+### Claude Code (recommended)
+
+Add to your project's `.mcp.json` - no local clone needed:
+
+```json
+{
+  "mcpServers": {
+    "ts-ast": {
+      "command": "npx",
+      "args": ["-y", "github:MitekAnalytics/ts-ast-mcp"]
+    }
+  }
+}
+```
+
+Restart Claude Code. The 20 tools appear automatically.
+
+`npx` fetches the repo, runs `prepare` (which builds), and starts the server. First run takes a few seconds; subsequent runs use the npx cache.
+
+### Local install (for development)
 
 ```bash
 git clone https://github.com/MitekAnalytics/ts-ast-mcp.git
 cd ts-ast-mcp
-npm install
-npm run build
+npm install    # prepare script builds automatically
 ```
 
-## Usage
-
-### Claude Code
-
-Add to your project's `.mcp.json`:
+Then reference the local build in `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "ts-ast": {
       "command": "node",
-      "args": ["/absolute/path/to/ts-ast-mcp/dist/index.js"]
+      "args": ["/path/to/ts-ast-mcp/dist/index.js"]
     }
   }
 }
 ```
 
-Restart Claude Code. The 20 tools will appear automatically.
+### Any MCP client
 
-### Any MCP Client
-
-The server uses stdio transport. Pipe JSON-RPC messages to stdin:
+The server uses stdio transport. Send JSON-RPC over stdin:
 
 ```bash
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"0.1.0"}}}' | node dist/index.js
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"0.1.0"}}}' | npx -y github:MitekAnalytics/ts-ast-mcp
 ```
 
 ## Tools
